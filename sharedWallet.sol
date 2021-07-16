@@ -5,11 +5,26 @@ contract SharedWallet {
     uint public balance;
     
     struct Account {
-        address account;
+        address payable account;
         bool permitted;
     }
     
     Account[] public permittedAccounts;
+    
+    function getAccountIndex(address _addr) public view returns (uint) {
+    for(uint i = 0; i< permittedAccounts.length; i++){
+      if(_addr == permittedAccounts[i].account) {
+             return i;
+      }
+   
+    }
+  }
+    
+    modifier onlyPermittedAccount(address _addr) {
+        uint accountIndex = getAccountIndex(_addr);
+        require(permittedAccounts[accountIndex].permitted, "Acount not permitted.");
+        _;
+    }
     
     function giveAccountPermission(Account memory _account) public {
         require(_account.permitted == true, "You have already been granted permission to use this account");
@@ -21,7 +36,7 @@ contract SharedWallet {
     }
     
 
-    function withdrawMoney(address payable _to, uint _amount) public {
+    function withdrawMoney(address payable _to, uint _amount) public onlyPermittedAccount(_to)  {
         _to.transfer(_amount);
     }
     
