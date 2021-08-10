@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.7.5;
+pragma solidity >=0.7.0 <0.9.0;
 
 contract Escrow {
     address public depositor;
@@ -12,7 +12,12 @@ contract Escrow {
         depositor = msg.sender;
     }
 
-    function approve() external {
+    modifier onlyArbiter(){
+        require(msg.sender == arbiter);
+        _;
+    }
+
+    function approve() external onlyArbiter {
         beneficiary.transfer(address(this).balance);
     }
 }
